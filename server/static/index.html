@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trend Matrix AI</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Trend Matrix</h1>
+    <p class="subtitle">AI-Based Personalized Style Recommendation</p>
+
+    <!-- ================= GENDER SELECTION ================= -->
+
+    <form id="uploadForm">
+        
+        <label><strong>Select Gender:</strong></label>
+        <select name="gender" required>
+            <option value="">Choose Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select>
+
+        <br><br>
+
+        <!-- ================= CAMERA SECTION ================= -->
+
+        <video id="video" autoplay playsinline></video>
+
+        <div class="button-group">
+            <button type="button" onclick="startCamera()">Start Camera</button>
+            <button type="button" onclick="capturePhoto()">Capture & Analyze</button>
+        </div>
+
+        <hr>
+
+        <!-- ================= UPLOAD SECTION ================= -->
+
+        <input type="file" name="file" accept="image/*" />
+        <input type="number" name="height" placeholder="Height (cm)" required />
+        <input type="number" name="weight" placeholder="Weight (kg)" required />
+
+        <button type="submit">Upload & Analyze</button>
+
+    </form>
+
+    <div id="result"></div>
+
+</div>
+
+<script>
+
+let video = document.getElementById("video");
+let stream = null;
+
+// ================= START CAMERA =================
+
+async function startCamera() {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+    } catch (err) {
+        alert("Camera access denied.");
+    }
+}
+
+// ================= CAPTURE PHOTO =================
+
+async function capturePhoto() {
+
+    if (!stream) {
+        alert("Start camera first.");
+        return;
+    }
+
+    if (video.videoWidth === 0) {
+        alert("Camera not ready. Please wait.");
+        return;
+    }
+
+    const gender = document.querySelector('select[name="gender"]').value;
+    const height = document.querySelector('input[name="height"]').value;
+    const weight = document.querySelector('input[name="weight"]').value;
+
+    if (!gender || !height || !weight) {
+        alert("Please select gender and enter height & weight.");
+        return;
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0);
+
+    const blob = await new Promise(resolve =>
+        canvas.toBlob(resolve, "image/jpeg", 0.9)
+    );
+
+    let formData = new FormData();
+    formData.append("file", blob, "capture.jpg");
+    formData.append("gender", gender);
+    formData.append("height", height);
+    formData.append("weight", weight);
+
+    sendToServer(formData);
+
+    stream.getTracks().forEach(track => track.stop());
+    video.srcObject = null;
+    stream = null;
+}
+
+// ================= UPLOAD SUBMIT =================
+
+document.getElementById("uploadForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    if (!formData.get("gender")) {
+        alert("Please select gender.");
+        return;
+    }
+
+    sendToServer(formData);
+});
+
+// ================= SEND TO SERVER =================
+
+async function sendToServer(formData) {
+
+    document.getElementById("result").innerHTML =
+        `<div class="card"><p>Analyzing...</p></div>`;
+
+    try {
+        const response = await fetch("/analyze", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+        showResult(data);
+
+    } catch (error) {
+        document.getElementById("result").innerHTML =
+            `<div class="card"><p style="color:red;">Server error occurred.</p></div>`;
+    }
+}
+
+// ================= DISPLAY RESULT =================
+
+function showResult(data) {
+
+    if (data.error) {
+        document.getElementById("result").innerHTML =
+            `<div class="card"><p style="color:red;">${data.error}</p></div>`;
+        return;
+    }
+
+    document.getElementById("result").innerHTML = `
+        <div class="card">
+            <h2>Analysis Results</h2>
+
+            <p><strong>Face Shape:</strong> ${data.face_shape}</p>
+            <p><strong>Detection Confidence:</strong> ${data.confidence_score}%</p>
+            <p><strong>Skin Tone:</strong> ${data.skin_tone}</p>
+            <p><strong>Recommended Fit:</strong> ${data.fit}</p>
+
+            <hr>
+
+            <p><strong>Top Hairstyles:</strong><br>
+            ${data.hairstyles.slice(0,5).join(", ")}</p>
+
+            <p><strong>Top Specs:</strong><br>
+            ${data.specs.slice(0,5).join(", ")}</p>
+
+            <p><strong>Top Hats:</strong><br>
+            ${data.hats.slice(0,5).join(", ")}</p>
+
+            <p><strong>Recommended Colors:</strong><br>
+            ${data.clothing_colors.join(", ")}</p>
+
+            <br>
+            <a href="${data.product_link}" target="_blank">View Suggested Product</a>
+        </div>
+    `;
+}
+
+</script>
+
+</body>
+</html>
