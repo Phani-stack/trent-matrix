@@ -7,7 +7,7 @@ import axios from "axios";
 const LoginPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
-
+  const [message, setMessage] = useState("");
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -16,11 +16,16 @@ const LoginPage = () => {
         email: formData.email,
         password: formData.password,
       });
-      const token = response.data.token;
-      localStorage.setItem("token", token);
-      navigate("/");
+
+      if (response.status === 200) {
+        const token = response.data.token;
+        localStorage.setItem("token", token);
+        navigate("/");
+      }
+
     } catch (error) {
       console.error("Login error:", error);
+      setMessage(error.response.data.message || "server error");
     }
   };
 
@@ -73,6 +78,10 @@ const LoginPage = () => {
               Authorize <ArrowRight size={14} />
             </button>
           </form>
+
+          {
+            message && <p className="text-center mt-4 text-xs text-zinc-600 uppercase tracking-widest">{message}</p>
+          }
 
           <div className="mt-8 flex flex-col items-center gap-4">
             <p className="text-xs text-zinc-600 uppercase tracking-widest">

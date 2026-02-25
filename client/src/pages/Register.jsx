@@ -7,15 +7,25 @@ import axios from "axios";
 const RegisterPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
-
-  const handleSubmit = (e) => {
+  const [message, setMessage] = useState("");
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = axios.post("http://localhost:8000/api/auth/register", {
-      user_name: formData.name,
-      email: formData.email,
-      password: formData.password,
-    });
-    navigate("/login");
+    try {
+      const response = await axios.post("http://localhost:8000/api/auth/register", {
+        user_name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+      console.log(response.data.message);
+      if (response.status === 201) {
+        navigate("/login");
+      } else {
+        setMessage(response.data.message || "server error");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setMessage(error.response.data.message || "server error");
+    }
   };
 
   return (
@@ -78,6 +88,8 @@ const RegisterPage = () => {
             </button>
           </form>
 
+          {message && <p className="text-center text-zinc-500 text-xs uppercase tracking-tighter mt-4">{message}</p> }
+         
           <p className="mt-8 text-center text-xs text-zinc-600 uppercase tracking-widest">
             Already a member? <Link to="/login" className="text-zinc-100 hover:underline underline-offset-4">Login</Link>
           </p>

@@ -2,17 +2,28 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useNavigate, Link } from "react-router-dom";
 import { KeyRound, Mail, ArrowLeft, Send, ShieldCheck, ArrowRight } from "lucide-react";
+import axios from "axios";
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1); // 1: Email, 2: OTP
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    try {
+      await axios.post("http://localhost:8000/api/auth/forgot-password", { email });
+      localStorage.setItem("resetEmail", email);
+    } catch (error) {
+      console.error("Failed to send OTP:", error);
+      setMessage(error.response.data.message || "server error");
+      setLoading(false);
+      return;
+    }
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setLoading(false);
     setStep(2);
@@ -23,8 +34,7 @@ const ForgotPasswordPage = () => {
     const newOtp = [...otp];
     newOtp[index] = value.substring(value.length - 1);
     setOtp(newOtp);
-
-    // Auto-focus next input
+    localStorage.setItem("resetOTP", newOtp.join(""));
     if (value && index < 5) {
       document.getElementById(`otp-${index + 1}`).focus();
     }
@@ -82,6 +92,7 @@ const ForgotPasswordPage = () => {
                   <button disabled={loading} className="w-full bg-zinc-100 text-zinc-950 py-4 font-bold uppercase text-[10px] tracking-[0.3em] hover:bg-white transition-all flex items-center justify-center gap-2 disabled:opacity-50">
                     {loading ? "Sending..." : "Request Code"} <Send size={14} />
                   </button>
+                  {message && <p className="text-center text-zinc-500 text-xs uppercase tracking-tighter">{message}</p>}
                 </form>
               </motion.div>
             ) : (
@@ -118,7 +129,6 @@ const ForgotPasswordPage = () => {
                     {loading ? "Verifying..." : "Confirm Code"} <ArrowRight size={14} />
                   </button>
                 </form>
-
                 <p className="mt-6 text-center text-[10px] text-zinc-600 uppercase tracking-widest">
                   Didn't receive code? <button onClick={() => setStep(1)} className="text-zinc-300 hover:underline underline-offset-4">Resend</button>
                 </p>

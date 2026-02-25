@@ -1,4 +1,8 @@
 import pool from '../config/db.js';
+import multer from 'multer';
+const upload = multer({ dest: 'uploads/' }); // Or your specific storage config
+
+
 
 export const getProfile = async (request, response) => {
     console.log("request.user:", request.user);
@@ -21,10 +25,21 @@ export const getProfile = async (request, response) => {
 
 export const updateProfile = async (request, response) => {
     const userId = request.user.userId;
-    const { name, bio, image } = request.body;
+    const { name, bio } = request.body;
+    
+    // If a file was uploaded, use its path; otherwise, keep existing or null
+    const imagePath = request.file ? request.file.path : request.body.image;
+
     try {
-        await pool.query('UPDATE users SET user_name = ?, biography = ?, image = ? WHERE user_id = ?', [name, bio, image, userId]);
-        response.status(200).json({ message: 'Profile updated successfully' });
+        await pool.query(
+            'UPDATE users SET user_name = ?, biography = ?, image = ? WHERE user_id = ?', 
+            [name, bio, imagePath, userId]
+        );
+        
+        response.status(200).json({ 
+            message: 'Profile updated successfully',
+            image: imagePath 
+        });
     } catch (error) {
         console.error('Error updating user profile:', error);
         response.status(500).json({ error: 'Internal server error' });

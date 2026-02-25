@@ -2,12 +2,14 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { Lock, ShieldCheck, ArrowRight, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import axios from "axios";
 
 const ResetPasswordPage = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ password: "", confirmPassword: "" });
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   const isMatch = formData.password && formData.password === formData.confirmPassword;
 
@@ -16,7 +18,18 @@ const ResetPasswordPage = () => {
     if (!isMatch) return;
 
     setLoading(true);
-    // Simulate API update
+    try {
+      await axios.post("http://localhost:8000/api/auth/reset-password", {
+        email: localStorage.getItem("resetEmail"),
+        otp: localStorage.getItem("resetOTP"),
+        newPassword: formData.password,
+      });
+    } catch (error) {
+      console.error("Password reset failed:", error);
+      setMessage(error.response.data.message || "server error");
+      setLoading(false);
+      return;
+    }
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setLoading(false);
 
@@ -76,11 +89,10 @@ const ResetPasswordPage = () => {
                   placeholder="CONFIRM PASSWORD"
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className={`w-full bg-transparent border py-3 pl-10 pr-12 outline-none transition-colors text-xs tracking-widest ${
-                    formData.confirmPassword
+                  className={`w-full bg-transparent border py-3 pl-10 pr-12 outline-none transition-colors text-xs tracking-widest ${formData.confirmPassword
                       ? (isMatch ? "border-emerald-900/50 focus:border-emerald-500" : "border-red-900/50 focus:border-red-500")
                       : "border-zinc-800 focus:border-zinc-100"
-                  }`}
+                    }`}
                   required
                 />
                 {isMatch && (
@@ -88,7 +100,7 @@ const ResetPasswordPage = () => {
                 )}
               </div>
             </div>
-
+            {message && <p className="text-center text-zinc-500 text-xs uppercase tracking-tighter">{message}</p>}
             <div className="pt-4">
               <button
                 disabled={loading || !isMatch}

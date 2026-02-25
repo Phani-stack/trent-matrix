@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion"; // Changed to framer-motion standard
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -17,24 +17,59 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null); // Added for Multer
   const [profile, setProfile] = useState({
     name: "",
     bio: "",
     image: ""
   });
 
+  const getImageUrl = (img) => {
+    if (!img) return "";
+    if (img.startsWith("data:") || img.startsWith("blob:")) return img;
+    return `http://localhost:8000/${img}`;
+  };
+
+  const fetchProfile = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:8000/api/user/profile", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setProfile({
+        name: response.data.user_name || "",
+        bio: response.data.biography || "",
+        image: response.data.image || "https://mediastreet.ie/wp-content/uploads/2017/08/blank-profile-picture.png"
+      });
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    }
+  };
+
   const updateProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put("http://localhost:8000/api/user/profile", {
-        name: profile.name,
-        bio: profile.bio,
-        image: profile.image
-      }, {
+      
+      // Use FormData instead of a JSON object for file uploads
+      const formData = new FormData();
+      formData.append("name", profile.name);
+      formData.append("bio", profile.bio);
+      
+      if (selectedFile) {
+        formData.append("image", selectedFile);
+      } else {
+        // Send current image path if no new file is selected
+        formData.append("image", profile.image);
+      }
+
+      await axios.put("http://localhost:8000/api/user/profile", formData, {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data"
         }
       });
+      
+      setSelectedFile(null);
       fetchProfile();
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -42,34 +77,16 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
-    // Fetch user profile data from the server
-    const fetchProfile = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:8000/api/user/profile", {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setProfile({
-          name: response.data.user_name,
-          bio: response.data.biography,
-          image: response.data.image
-        });
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      }
-    };
-
     fetchProfile();
   }, []);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setSelectedFile(file); // Save actual file for API
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfile({ ...profile, image: reader.result });
+        setProfile({ ...profile, image: reader.result }); // Set preview
       };
       reader.readAsDataURL(file);
     }
@@ -114,12 +131,11 @@ const ProfilePage = () => {
               onClick={() => isEditing && fileInputRef.current.click()}
               className={`relative group aspect-square bg-zinc-900 overflow-hidden border border-zinc-800 ${isEditing ? 'cursor-pointer' : 'cursor-default'}`}
             >
-              {/* Broken Outline Motif */}
               <div className="absolute -top-px left-1/4 right-1/4 h-px bg-zinc-950 z-10" />
               <div className="absolute -bottom-px left-1/4 right-1/4 h-px bg-zinc-950 z-10" />
 
               <img
-                src={profile.image}
+                src={getImageUrl(profile.image)}
                 alt="Profile"
                 className={`w-full h-full object-cover grayscale transition-all duration-500 ${isEditing ? 'opacity-50 blur-[2px]' : 'opacity-80'}`}
               />
@@ -166,7 +182,6 @@ const ProfilePage = () => {
               </div>
             </section>
 
-            {/* Account Settings */}
             <div className="pt-8 border-t border-zinc-900 space-y-4">
                <button className="flex items-center justify-between w-full group py-2">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 group-hover:text-zinc-100 transition-colors">Change Password</span>
@@ -174,7 +189,7 @@ const ProfilePage = () => {
               </button>
 
               <button
-                onClick={() => handleLogout()}
+                onClick={handleLogout}
                 className="flex items-center justify-between w-full group py-2"
               >
                 <span className="text-[10px] font-bold uppercase tracking-widest text-red-900 group-hover:text-red-500 transition-colors">Terminate Session</span>
@@ -186,6 +201,6 @@ const ProfilePage = () => {
       </div>
     </div>
   );
-}
+};
 
 export default ProfilePage;

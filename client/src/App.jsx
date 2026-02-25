@@ -26,9 +26,7 @@ const App = () => {
         <NavBar />
       </div>
 
-      {/* Main Content Container
-          pt-20 (80px) offsets the fixed navbar height
-      */}
+
       <div className="pt-20 min-h-screen bg-zinc-950">
         <Routes>
           {/* Public Routes */}
@@ -49,7 +47,7 @@ const App = () => {
           />
 
           <Route
-            path="/selection" // Changed from /upload to match your nav links
+            path="/selection" 
             element={
               <ProtectedRoute>
                 <SelectionPage />

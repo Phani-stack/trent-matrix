@@ -2,13 +2,15 @@ import { motion } from "motion/react";
 import {
   ExternalLink,
   Layers,
-  Trash2,
   Palette,
   Shirt,
   Glasses,
   Footprints,
   CheckCircle2,
-  ChevronRight
+  Scan,
+  Maximize2,
+  Sparkles,
+  Droplets
 } from "lucide-react";
 
 export default function CollectionsPage() {
@@ -26,28 +28,39 @@ export default function CollectionsPage() {
         hips: "96cm",
         face: "Oval"
       },
+      morphology: {
+        faceRatio: "1.618",
+        jawline: "45° Angularity",
+        eyeSpacing: "Symmetrical",
+        browType: "Prominent"
+      },
+      chromatics: {
+        season: "Deep Winter",
+        contrast: "High",
+        undertone: "Cool Olive",
+        bestMetals: "Silver / Steel",
+        avoid: "Muted Earth Tones",
+      },
       analysis: {
         description: "A high-contrast aesthetic leveraging structured shoulders to complement the oval face shape. Recommended fabrics include matte nylon and technical wool.",
-        styleType: "Tech-Minimalism" ,
-        colorPalette: ["#09090b", "#27272a", "#52525b", "#e4e4e7"],
-        undertone: "Cool / Olive",
+        styleType: "Tech-Minimalism",
+        colorPalette: ["#09090b", "#1e1b4b", "#312e81", "#e4e4e7"],
       },
-      // Categorized E-Commerce Links
       curation: {
         eyewear: [
-          { label: "Matte Aviators", site: "Gentle Monster", url: "https://gentlemonster.com" },
-          { label: "Tech Frames", site: "Oakley", url: "https://oakley.com" }
+          { label: "Matte Aviators", site: "Gentle Monster", url: "#" },
+          { label: "Tech Frames", site: "Oakley", url: "#" }
         ],
         headwear: [
-          { label: "Structural Cap", site: "New Era", url: "https://neweracap.com" }
+          { label: "Structural Cap", site: "New Era", url: "#" }
         ],
         apparel: [
-          { label: "Shell Jacket", site: "Arc'teryx", url: "https://arcteryx.com" },
-          { label: "Cargo Pants", site: "Stone Island", url: "https://stoneisland.com" }
+          { label: "Shell Jacket", site: "Arc'teryx", url: "#" },
+          { label: "Cargo Pants", site: "Stone Island", url: "#" }
         ],
         footwear: [
-          { label: "Technical Boots", site: "Nike ACG", url: "https://nike.com" },
-          { label: "Minimalist Runners", site: "SSENSE", url: "https://ssense.com" }
+          { label: "Technical Boots", site: "Nike ACG", url: "#" },
+          { label: "Minimalist Runners", site: "SSENSE", url: "#" }
         ]
       }
     }
@@ -64,8 +77,6 @@ export default function CollectionsPage() {
           <a
             key={idx}
             href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
             className="group flex items-center justify-between p-3 bg-zinc-900/30 border border-zinc-900 hover:border-zinc-500 transition-all"
           >
             <div className="flex flex-col">
@@ -89,7 +100,7 @@ export default function CollectionsPage() {
             whileInView={{ opacity: 1 }}
             className="grid grid-cols-1 lg:grid-cols-12 gap-16 border-t border-zinc-900 pt-16"
           >
-            {/* LEFT: Image & Technical Data */}
+            {/* LEFT: Image & Technical Identity */}
             <div className="lg:col-span-4 space-y-12">
               <div className="relative aspect-[3/4] border border-zinc-800 bg-zinc-900">
                 <img src={item.image} className="w-full h-full object-cover grayscale opacity-70" alt={item.name} />
@@ -100,6 +111,22 @@ export default function CollectionsPage() {
                 </div>
               </div>
 
+              {/* Facial Geometry (New) */}
+              <div className="space-y-6">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-2">
+                  <Scan size={12} /> Facial Morphology
+                </h3>
+                <div className="grid grid-cols-2 gap-px bg-zinc-900 border border-zinc-900">
+                  {Object.entries(item.morphology).map(([key, val]) => (
+                    <div key={key} className="bg-zinc-950 p-4">
+                      <p className="text-[8px] text-zinc-600 uppercase font-bold mb-1">{key}</p>
+                      <p className="text-xs font-medium uppercase">{val}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Body Parameters */}
               <div className="space-y-6">
                 <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-2">
                   <CheckCircle2 size={12} /> Body Geometry
@@ -115,7 +142,7 @@ export default function CollectionsPage() {
               </div>
             </div>
 
-            {/* RIGHT: Curation & Categories */}
+            {/* RIGHT: Curation & Chromatic Analysis */}
             <div className="lg:col-span-8 space-y-12">
               <div className="flex justify-between items-start">
                 <div>
@@ -124,11 +151,40 @@ export default function CollectionsPage() {
                 </div>
               </div>
 
+              {/* Chromatic Table (New Details) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-zinc-900 border border-zinc-900">
+                <div className="bg-zinc-950/50 p-6">
+                  <p className="text-[8px] text-zinc-600 uppercase font-black mb-4 tracking-widest">Color Analysis</p>
+                  <div className="space-y-3">
+                    <div className="flex justify-between border-b border-zinc-900 pb-2">
+                      <span className="text-[10px] text-zinc-400 uppercase">Seasonal Type</span>
+                      <span className="text-[10px] text-white uppercase">{item.chromatics.season}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-zinc-900 pb-2">
+                      <span className="text-[10px] text-zinc-400 uppercase">Undertone</span>
+                      <span className="text-[10px] text-white uppercase">{item.chromatics.undertone}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-zinc-950/50 p-6">
+                  <p className="text-[8px] text-zinc-600 uppercase font-black mb-4 tracking-widest">Suitability</p>
+                  <div className="space-y-3">
+                    <div className="flex justify-between border-b border-zinc-900 pb-2">
+                      <span className="text-[10px] text-zinc-400 uppercase">Metals</span>
+                      <span className="text-[10px] text-white uppercase">{item.chromatics.bestMetals}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-zinc-900 pb-2">
+                      <span className="text-[10px] text-red-900/50 uppercase">Avoid</span>
+                      <span className="text-[10px] text-zinc-500 uppercase">{item.chromatics.avoid}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="p-6 border-l-2 border-zinc-900 italic text-zinc-400 text-sm leading-relaxed font-light">
                 "{item.analysis.description}"
               </div>
 
-              {/* Departmental Links Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-8">
                 <CategorySection title="Eyewear / Specs" icon={Glasses} items={item.curation.eyewear} />
                 <CategorySection title="Apparel / Style" icon={Shirt} items={item.curation.apparel} />
