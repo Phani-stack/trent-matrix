@@ -74,29 +74,51 @@ app.get("/analyse", (request, response) => {
 });
 
 
+// Change :name to :name(*) to capture everything including special characters
+// This regex allows letters, numbers, underscores, dots, and parentheses
 app.get("/api/wiki/:name", async (req, res) => {
-  try {
-    const { name } = req.params;
-    // Replace spaces with _, encode special chars
-    const wikiTitle = encodeURIComponent(name.trim().replace(/\s+/g, "_"));
+  // Capture name immediately so it's available in the entire function scope
+  const rawName = req.params.name || ""; 
 
-    console.log("Fetching Wikipedia URL:", `https://en.wikipedia.org/api/rest_v1/page/summary/${wikiTitle}`);
+  try {
+    // 1. Format for Wikipedia (Handle spaces and specific naming)
+    const wikiTitle = encodeURIComponent(rawName.trim().replace(/\s+/g, "_"));
+
+    console.log(`[Wiki Request]: https://en.wikipedia.org/api/rest_v1/page/summary/${wikiTitle}`);
 
     const response = await axios.get(
-      `https://en.wikipedia.org/api/rest_v1/page/summary/${wikiTitle}`
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${wikiTitle}`,
+      {
+        headers: {
+          // Identify your app to Wikipedia to prevent 403 Forbidden errors
+          'User-Agent': 'TrendMatrixStyleApp/1.0 (kdlphani916@gmail.com) Axios/1.6.0'
+        }
+      }
     );
 
+    // 2. Map the data to your frontend schema
     res.json({
       title: response.data.title,
       description: response.data.extract,
       image: response.data.thumbnail?.source || null,
       source: response.data.content_urls?.desktop?.page || null,
     });
+
   } catch (error) {
-    console.error("Wiki fetch error:", error.message);
-    res.status(404).json({ error: "Details not found" });
+    // Log details for debugging
+    const status = error.response?.status;
+    console.error(`[Wiki Error]: ${status || 'Network Error'} - ${error.message}`);
+
+    // Fallback: If Wikipedia doesn't have the page, return a graceful response
+    res.status(status === 403 ? 403 : 200).json({ 
+      title: rawName.replace(/_/g, " "),
+      description: status === 403 
+        ? "Access to Wikipedia was denied. Check your server headers." 
+        : "We couldn't find a specific Wikipedia summary for this style, but it's a great look for your features!",
+      image: null,
+      source: null
+    });
   }
 });
-
 // application listening
 app.listen(8000, () => console.log(`server running on http://localhost:${port}`));

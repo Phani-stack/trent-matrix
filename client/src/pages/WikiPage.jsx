@@ -8,25 +8,24 @@ const WikiPage = () => {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
 
-  useEffect(() => {
-    const fetchWiki = async () => {
-      try {
-        // Decode URL (Spiky%20Hair → Spiky Hair)
-        const decodedName = decodeURIComponent(name);
-
-        const response = await axios.get(
-          `http://localhost:8000/api/wiki/${decodedName}`
-        );
-
-        setData(response.data);
-      } catch (error) {
-        console.error("Error fetching wiki data:", error);
-        setData({ title: "Not Found", description: "No details available." });
-      }
-    };
-
-    fetchWiki();
-  }, [name]);
+  // Inside your useEffect in WikiPage.js
+useEffect(() => {
+  const fetchWiki = async () => {
+    try {
+      const decodedName = decodeURIComponent(name);
+      const response = await axios.get(`http://localhost:8000/api/wiki/${decodedName}`);
+      setData(response.data);
+    } catch (error) {
+      // If the backend returns 404, the error.response.data will contain our custom message
+      setData({
+        title: error.response?.data?.title || "Not Found",
+        description: error.response?.data?.description || "We couldn't find details for this style.",
+        image: null
+      });
+    }
+  };
+  fetchWiki();
+}, [name]);
 
   if (!data) {
     return (

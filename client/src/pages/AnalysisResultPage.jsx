@@ -117,9 +117,7 @@ const AnalysisResultPage = () => {
   }
 
   const handleViewDetails = (itemName) => {
-    const query = encodeURIComponent(itemName);
-    const googleUrl = `https://www.google.com/search?q=${query}`;
-    window.open(googleUrl, "_blank");
+   navigate(`/wiki/${encodeURIComponent(itemName)}`);
   };
 
   const handleAddToCollection = async () => {

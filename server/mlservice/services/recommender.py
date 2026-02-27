@@ -67,7 +67,7 @@ def generate_recommendation(face_shape, skin_tone, height, weight, gender):
     ],
 
     "Rectangle": [
-        "Side part (hairstyle)",
+        "Regular haircut",
         "Textured crop",
         "Classic taper",
         "Pompadour (hairstyle)",
