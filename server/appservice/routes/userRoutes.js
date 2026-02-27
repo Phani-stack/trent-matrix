@@ -6,7 +6,7 @@ const upload = multer({ dest: 'uploads/' })
 
 const userRouter = express.Router();
 
-userRouter.get('/profile', isAuthenticated, getProfile);
+userRouter.get('/profile',  getProfile);
 userRouter.get('/public/:id', getPublicProfile);
 userRouter.get('/search', isAuthenticated, searchUsers);
 userRouter.put('/profile', isAuthenticated, upload.single('image'), updateProfile);

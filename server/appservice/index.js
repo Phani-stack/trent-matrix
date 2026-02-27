@@ -8,9 +8,15 @@ import "dotenv/config";
 // router imports
 import authRouter from './routes/authRoutes.js';
 import userRouter from './routes/userRoutes.js';
+import collectionRouter from './routes/collectionRouter.js';
+// gloabal rate limiter
+import { globalLimiter } from './middlewares/rateLimiters.js';
+
 
 // application configuration
 const app = express();
+
+app.use(globalLimiter);
 app.use(express.json());
 app.use(cors({ origin: "http://localhost:5173" }));
 app.use('/uploads', express.static('uploads'));
@@ -30,9 +36,7 @@ app.get("/", (request, response) => {
 // routing setup
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
-
-
-
+app.use("/api/collection", collectionRouter);
 
 // temp ai
 

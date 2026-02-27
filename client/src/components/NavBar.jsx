@@ -89,7 +89,10 @@ const Navbar = () => {
               </button>
             ))}
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => {
+                localStorage.removeItem("token");
+                navigate("/login");
+              }}
               className="mt-auto flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-red-900/80 border-t border-zinc-900 pt-8"
             >
               <LogOut size={16} /> Sign Out

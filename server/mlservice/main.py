@@ -10,9 +10,21 @@ from services.face_detection import detect_face_shape
 from services.skin_tone import detect_skin_tone
 from services.recommender import generate_recommendation
 
+
+from fastapi.middleware.cors import CORSMiddleware
+
+
+
+
 app = FastAPI(title="Trend Matrix AI")
 
-# ================= STATIC FILE SETUP =================
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
@@ -26,13 +38,13 @@ def home():
         return f.read()
 
 
-# ================= ANALYZE ENDPOINT =================
-
 @app.post("/analyze")
 async def analyze(
     gender: str = Form(...),
     height: float = Form(...),
     weight: float = Form(...),
+    hips: float = Form(...),
+    waist: float = Form(...),
     file: Optional[UploadFile] = File(None),
 ):
     try:
@@ -78,8 +90,6 @@ async def analyze(
     except Exception as e:
         return {"error": str(e)}
 
-
-# ================= HEALTH CHECK =================
 
 @app.get("/health")
 def health():

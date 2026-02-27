@@ -17,6 +17,7 @@ import Collection from './pages/Collection.jsx';
 import SearchUsersPage from './pages/Search.jsx';
 import PublicProfilePage from './pages/PublicProfilePage.jsx';
 import NavBar from './components/NavBar.jsx';
+import AnalysisResultPage from './pages/AnalysisResultPage.jsx';
 
 const App = () => {
   return (
@@ -47,7 +48,7 @@ const App = () => {
           />
 
           <Route
-            path="/selection" 
+            path="/selection"
             element={
               <ProtectedRoute>
                 <SelectionPage />
@@ -103,7 +104,10 @@ const App = () => {
               <PublicProfilePage />
             </ProtectedRoute>} />
 
-
+          <Route path="/analysis-result" element={
+            <ProtectedRoute>
+              <AnalysisResultPage />
+            </ProtectedRoute>} />
 
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

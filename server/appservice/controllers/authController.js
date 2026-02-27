@@ -6,93 +6,223 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+
 const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
 });
 
-const sentOTP = async (email) => {
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: "Your OTP for Password Reset",
-        text: `Your OTP for password reset is: ${otp}`,
-    };
-    await transporter.sendMail(mailOptions);
-    return otp;
+
+const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-export const login = async (request, response) => {
-    const { email, password } = request.body;
-    try {
-        const [rows] = await pool.query("SELECT * FROM users WHERE user_email = ?", [email]);
-        if (rows.length === 0) {
-            return response.status(401).json({ message: "user not found, please register" });
-        }
-        const isPasswordValid = await bcrypt.compare(password, rows[0].user_password);
-        if (!isPasswordValid) {
-            return response.status(401).json({ message: "invalid password, please check" });
-        }
-        const token = jwt.sign({ userId: rows[0].user_id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-        response.status(200).json({ message: "login successful", token });
-    } catch (err) {
-        response.status(500).json({ message: "server error", error: err.message });
-    }
+const sendEmail = async (email, subject, text) => {
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject,
+    text,
+  });
 };
 
-export const register = async (request, response) => {
-    const { user_name, email, password } = request.body;
-    try {
-        const [rows] = await pool.query("SELECT * FROM users WHERE user_email = ?", [email]);
-        if (rows.length > 0) {
-            return response.status(401).json({ message: "user already exists" });
-        }
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await pool.query(
-            "INSERT INTO users (user_name, user_email, user_password, biography, image) VALUES (?, ?, ?, ?, ?)",
-            [user_name, email, hashedPassword, "The Trend Matrix user", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZG3qkyaZZsnYyKv3-iTLyK_WT6QFmBQz3IQ&s"]
-        );
-        response.status(201).json({ message: "user registered successfully" });
-    } catch (err) {
-        response.status(500).json({ message: "server error", error: err.message });
+
+export const register = async (req, res) => {
+  const { user_name, email, password } = req.body;
+
+  try {
+    const [existing] = await pool.query(
+      "SELECT * FROM users WHERE user_email = ?",
+      [email]
+    );
+
+    if (existing.length > 0) {
+      return res.status(400).json({ message: "User already exists" });
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const otp = generateOTP();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 min expiry
+
+    await pool.query(
+      `INSERT INTO users
+       (user_name, user_email, user_password, otp, otp_expiry, is_verified)
+       VALUES (?, ?, ?, ?, ?, false)`,
+      [user_name, email, hashedPassword, otp, otpExpiry]
+    );
+
+    await sendEmail(
+      email,
+      "Verify Your Email - Trend Matrix",
+      `Your OTP is: ${otp}. It expires in 5 minutes.`
+    );
+
+    res.status(201).json({ message: "OTP sent to email" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
 };
 
-export const forgotPassword = async (request, response) => {
-    const { email } = request.body;
-    try {
-        const [rows] = await pool.query("SELECT * FROM users WHERE user_email = ?", [email]);
-        if (rows.length === 0) {
-            return response.status(401).json({ message: "user not found" });
-        }
-        const otp = await sentOTP(email);
-        await pool.query("UPDATE users SET otp = ? WHERE user_email = ?", [otp, email]);
-        response.status(200).json({ message: "OTP sent to email" });
-    } catch (err) {
-        response.status(500).json({ message: "Failed to send OTP", error: err.message });
+
+export const verifyOtp = async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    const [rows] = await pool.query(
+      "SELECT * FROM users WHERE user_email = ?",
+      [email]
+    );
+
+    if (rows.length === 0) {
+      return res.status(400).json({ message: "User not found" });
     }
+
+    const user = rows[0];
+
+    if (user.is_verified) {
+      return res.status(400).json({ message: "User already verified" });
+    }
+
+    if (user.otp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    if (new Date() > new Date(user.otp_expiry)) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    await pool.query(
+      `UPDATE users
+       SET is_verified = true, otp = NULL, otp_expiry = NULL
+       WHERE user_email = ?`,
+      [email]
+    );
+
+    res.status(200).json({ message: "Email verified successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
 };
 
-export const resetPassword = async (request, response) => {
-    const { email, otp, newPassword } = request.body;
-    try {
-        const [rows] = await pool.query("SELECT * FROM users WHERE user_email = ?", [email]);
-        if (rows.length === 0) {
-            return response.status(401).json({ message: "user not found, please register" });
-        }
-        if (rows[0].otp !== otp || !otp) {
-            return response.status(401).json({ message: "invalid OTP" });
-        }
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        await pool.query("UPDATE users SET user_password = ?, otp = NULL WHERE user_email = ?", [hashedPassword, email]);
-        response.status(200).json({ message: "password reset successful" });
-    } catch (err) {
-        response.status(500).json({ message: "server error", error: err.message });
+
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const [rows] = await pool.query(
+      "SELECT * FROM users WHERE user_email = ?",
+      [email]
+    );
+
+    if (rows.length === 0) {
+      return res.status(401).json({ message: "User not found" });
     }
+
+    const user = rows[0];
+
+    if (!user.is_verified) {
+      return res.status(401).json({ message: "Please verify your email first" });
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      user.user_password
+    );
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    const token = jwt.sign(
+      { userId: user.user_id },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
+
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const [rows] = await pool.query(
+      "SELECT * FROM users WHERE user_email = ?",
+      [email]
+    );
+
+    if (rows.length === 0) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    const otp = generateOTP();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+
+    await pool.query(
+      "UPDATE users SET otp = ?, otp_expiry = ? WHERE user_email = ?",
+      [otp, otpExpiry, email]
+    );
+
+    await sendEmail(
+      email,
+      "Password Reset OTP - Trend Matrix",
+      `Your password reset OTP is: ${otp}. It expires in 5 minutes.`
+    );
+
+    res.status(200).json({ message: "OTP sent to email" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to send OTP", error: err.message });
+  }
+};
+
+
+export const resetPassword = async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+
+  try {
+    const [rows] = await pool.query(
+      "SELECT * FROM users WHERE user_email = ?",
+      [email]
+    );
+
+    if (rows.length === 0) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    const user = rows[0];
+
+    if (user.otp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    if (new Date() > new Date(user.otp_expiry)) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await pool.query(
+      `UPDATE users
+       SET user_password = ?, otp = NULL, otp_expiry = NULL
+       WHERE user_email = ?`,
+      [hashedPassword, email]
+    );
+
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
 };

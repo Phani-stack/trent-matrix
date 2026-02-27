@@ -15,8 +15,9 @@ export const getProfile = async (request, response) => {
         response.status(200).json({
             user_name: result[0].user_name,
             biography: result[0].biography,
-            image: result[0].image
+            image: result[0].image || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbSYAgHI38DctxxtEawjjNzeRxrpGuprgDTQ&s"
         });
+
     } catch (error) {
         console.error('Error fetching user profile:', error);
         response.status(500).json({ error: 'Internal server error' });
@@ -26,19 +27,19 @@ export const getProfile = async (request, response) => {
 export const updateProfile = async (request, response) => {
     const userId = request.user.userId;
     const { name, bio } = request.body;
-    
+
     // If a file was uploaded, use its path; otherwise, keep existing or null
     const imagePath = request.file ? request.file.path : request.body.image;
 
     try {
         await pool.query(
-            'UPDATE users SET user_name = ?, biography = ?, image = ? WHERE user_id = ?', 
+            'UPDATE users SET user_name = ?, biography = ?, image = ? WHERE user_id = ?',
             [name, bio, imagePath, userId]
         );
-        
-        response.status(200).json({ 
+
+        response.status(200).json({
             message: 'Profile updated successfully',
-            image: imagePath 
+            image: imagePath
         });
     } catch (error) {
         console.error('Error updating user profile:', error);
