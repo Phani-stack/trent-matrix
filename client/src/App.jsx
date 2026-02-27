@@ -42,45 +42,45 @@ const App = () => {
           <Route
             path="/collections"
             element={
-              <ProtectedRoute>
+              // <ProtectedRoute>
                 <Collections />
-              </ProtectedRoute>
+              // </ProtectedRoute>
             }
           />
 
           <Route
             path="/selection"
             element={
-              <ProtectedRoute>
+              // <ProtectedRoute>
                 <SelectionPage />
-              </ProtectedRoute>
+              // </ProtectedRoute>
             }
           />
 
           <Route
             path="/computer-vision"
             element={
-              <ProtectedRoute>
+              // <ProtectedRoute>
                 <ComputerVisionPage />
-              </ProtectedRoute>
+              // </ProtectedRoute>
             }
           />
 
           <Route
             path="/body-details"
             element={
-              <ProtectedRoute>
+              // <ProtectedRoute>
                 <BodyDetailsPage />
-              </ProtectedRoute>
+              //  </ProtectedRoute>
             }
           />
 
           <Route
             path="/profile"
             element={
-              <ProtectedRoute>
+              // <ProtectedRoute>
                 <ProfilePage />
-              </ProtectedRoute>
+              // </ProtectedRoute>
             }
 
           />
@@ -95,20 +95,24 @@ const App = () => {
 
           <Route path="/collection/:id"
             element={
-              <ProtectedRoute>
+              // <ProtectedRoute>
                 <Collection />
-              </ProtectedRoute>}
+              // </ProtectedRoute>}
+            }
           />
 
           <Route path="/public-profile/:id" element={
-            <ProtectedRoute>
-              <PublicProfilePage />
-            </ProtectedRoute>} />
+            // <ProtectedRoute>
+                <PublicProfilePage />}
+            // </ProtectedRoute>}
+          />
 
           <Route path="/analysis-result" element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <AnalysisResultPage />
-            </ProtectedRoute>} />
+          }
+            // </ProtectedRoute>}
+            />
 
             <Route path="/wiki/:name" element={<WikiPage />} />
 
