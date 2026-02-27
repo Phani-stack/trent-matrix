@@ -11,9 +11,17 @@ const WikiPage = () => {
   useEffect(() => {
     const fetchWiki = async () => {
       try {
+        // Decode URL (Spiky%20Hair → Spiky Hair)
+        const decodedName = decodeURIComponent(name);
+
+        // Convert to Wikipedia format (Spiky Hair → Spiky_hair)
+        const wikiFormatted =
+          decodedName.trim().replace(/\s+/g, "_");
+
         const response = await axios.get(
-          `http://localhost:8000/api/wiki/${name}`
+          `http://localhost:8000/api/wiki/${wikiFormatted}`
         );
+
         setData(response.data);
       } catch (error) {
         console.error("Error fetching wiki data:", error);

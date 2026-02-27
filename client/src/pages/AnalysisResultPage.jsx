@@ -36,6 +36,7 @@ const AnalysisResultPage = () => {
         formData.append("hips", requestData.hips);
         formData.append("waist", requestData.waist);
 
+        // Convert base64 image to Blob
         const base64 = requestData.image.split(",")[1];
         const byteCharacters = atob(base64);
         const byteNumbers = [];
@@ -54,6 +55,7 @@ const AnalysisResultPage = () => {
           formData
         );
 
+        console.log("Backend Response:", response.data);
         setData(response.data);
       } catch (error) {
         console.error("Error fetching analysis:", error);
@@ -82,11 +84,8 @@ const AnalysisResultPage = () => {
   }
 
   const handleViewDetails = (itemName) => {
-    const wikiFormatted = itemName.trim().replace(/\s+/g, "_");
-    window.open(
-      `https://en.wikipedia.org/wiki/${wikiFormatted}`,
-      "_blank"
-    );
+    const formattedName = itemName.trim().replace(/\s+/g, "_");
+    navigate(`/wiki/${encodeURIComponent(formattedName)}`);
   };
 
   const handleAddToCollection = async () => {
@@ -265,4 +264,3 @@ const AnalysisResultPage = () => {
 };
 
 export default AnalysisResultPage;
-

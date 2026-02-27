@@ -75,31 +75,23 @@ app.get("/analyse", (request, response) => {
 
 
 app.get("/api/wiki/:name", async (req, res) => {
-  try {
-    const { name } = req.params;
+    try {
+        const { name } = req.params;
+        // encodeURIComponent handles brackets and spaces: "Beanie (seam-cap)" -> "Beanie_%28seam-cap%29"
+        const wikiTitle = name.trim().replace(/\s+/g, "_");
 
-    const response = await axios.get(
-      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name)}`,
-      {
-        headers: {
-          "User-Agent": "FashionAI-Hackathon-Project/1.0 (contact: kdlphani916@email.com)"
-        },
-        timeout: 15000
-      }
-    );
+        const response = await axios.get(
+            `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiTitle)}`
+        );
 
-
-    res.status(200).json({
-      title: response.data.title,
-      description: response.data.extract,
-      image: response.data.thumbnail?.source || null,
-      source: response.data.content_urls?.desktop?.page
-    });
-
-  } catch (error) {
-    console.error(error.response?.data || error.message);
-    res.status(500).json({ error: "Failed to fetch data" });
-  }
+        res.json({
+            title: response.data.title,
+            extract: response.data.extract,
+            thumbnail: response.data.thumbnail?.source
+        });
+    } catch (error) {
+        res.status(404).json({ error: "Details not found" });
+    }
 });
 
 // application listening

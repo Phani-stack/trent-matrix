@@ -1,6 +1,7 @@
 def generate_recommendation(face_shape, skin_tone, height, weight, gender):
 
-    bmi = weight / ((height/100) ** 2)
+    # ================= BMI CALCULATION =================
+    bmi = weight / ((height / 100) ** 2)
 
     if bmi < 18.5:
         body_type = "Lean"
@@ -12,186 +13,168 @@ def generate_recommendation(face_shape, skin_tone, height, weight, gender):
     # ================= MALE HAIRSTYLES =================
 
     male_hairstyles = {
+    "Oval": [
+        "Undercut (hairstyle)",
+        "Pompadour (hairstyle)",
+        "Crew cut",
+        "Slicked-back hair",
+        "Quiff (hairstyle)",
+        "Buzz cut",
+        "Fade (hairstyle)",
+        "Layered hair",
+        "Taper cut",
+        "Ivy League (haircut)",
+        "Comb over",
+        "Caesar cut",
+        "Man bun",
+        "Flat top",
+        "Side part (hairstyle)",
+        "Curtain hair",
+        "Short back and sides",
+        "Textured crop"
+    ],
 
-        "Oval": [
-            "Undercut (hairstyle)",
-            "Pompadour (hairstyle)",
-            "Crew cut",
-            "Slicked-back hair",
-            "Quiff",
-            "Buzz cut",
-            "Fade (haircut)",
-            "Layered hair",
-            "Taper cut",
-            "Ivy League (haircut)",
-            "Comb over",
-            "Caesar cut",
-            "Man bun",
-            "Flat top",
-            "Side part (hairstyle)",
-            "Curtain haircut",
-            "Short back and sides",
-            "Textured crop"
-        ],
+    "Round": [
+        "Quiff (hairstyle)",
+        "Spiky hair",
+        "Fringe (hairstyle)",
+        "Pompadour (hairstyle)",
+        "Side part (hairstyle)",
+        "Faux hawk",
+        "Undercut (hairstyle)",
+        "Fade (hairstyle)",
+        "Taper cut",
+        "Layered hair",
+        "Textured crop",
+        "Comb over",
+        "Low fade",
+        "Classic taper"
+    ],
 
-        "Round": [
-            "Quiff",
-            "Spiky hair",
-            "Fringe (hair)",
-            "Pompadour (hairstyle)",
-            "Side part (hairstyle)",
-            "Fauxhawk",
-            "Undercut (hairstyle)",
-            "Fade (haircut)",
-            "Taper cut",
-            "Layered hair",
-            "Short back and sides",
-            "Man bun",
-            "Ivy League (haircut)",
-            "Textured crop",
-            "Comb over"
-        ],
+    "Square": [
+        "Buzz cut",
+        "Flat top",
+        "Crew cut",
+        "Side part (hairstyle)",
+        "Taper cut",
+        "Fade (hairstyle)",
+        "Undercut (hairstyle)",
+        "Caesar cut",
+        "Comb over",
+        "Ivy League (haircut)",
+        "Spiky hair",
+        "Pompadour (hairstyle)"
+    ],
 
-        "Square": [
-            "Buzz cut",
-            "Flat top",
-            "Crew cut",
-            "Side part (hairstyle)",
-            "Taper cut",
-            "Fade (haircut)",
-            "Undercut (hairstyle)",
-            "Caesar cut",
-            "Comb over",
-            "Ivy League (haircut)",
-            "Spiky hair",
-            "Pompadour (hairstyle)"
-        ]
-    }
+    "Rectangle": [
+        "Side part (hairstyle)",
+        "Textured crop",
+        "Classic taper",
+        "Pompadour (hairstyle)",
+        "Layered hair",
+        "Fringe (hairstyle)"
+    ],
+
+    "Heart": [
+        "Side-swept bangs",
+        "Layered hair",
+        "Textured hair",
+        "Fringe (hairstyle)",
+        "Soft quiff"
+    ],
+
+    "Diamond": [
+        "Fringe (hairstyle)",
+        "Layered hair",
+        "Textured crop",
+        "Side part (hairstyle)"
+    ]
+}
 
     # ================= FEMALE HAIRSTYLES =================
 
     female_hairstyles = {
+    "Oval": [
+        "Layered hair",
+        "Bob cut",
+        "Curtain bangs",
+        "Shag (haircut)",
+        "Pixie cut",
+        "Waves (hairstyle)",
+        "Curly hair",
+        "Straight hair",
+        "Side part (hairstyle)",
+        "Middle part"
+    ],
 
-        "Oval": [
-            "Bob cut",
-            "Long hair",
-            "Layered hair",
-            "Curtain bangs",
-            "Shag (haircut)",
-            "Pixie cut",
-            "Ponytail",
-            "Chignon",
-            "Braid",
-            "French braid",
-            "Side part (hairstyle)",
-            "Middle part (hairstyle)"
-        ],
+    "Round": [
+        "Layered hair",
+        "Side-swept bangs",
+        "Straight hair",
+        "Shag (haircut)",
+        "Curtain bangs",
+        "Ponytail"
+    ],
 
-        "Round": [
-            "Layered hair",
-            "Long hair",
-            "Bob cut",
-            "Shag (haircut)",
-            "Curtain bangs",
-            "Side part (hairstyle)",
-            "Ponytail",
-            "Chignon",
-            "French braid",
-            "Pixie cut"
-        ],
+    "Square": [
+        "Layered hair",
+        "Waves (hairstyle)",
+        "Curtain bangs",
+        "Bob cut",
+        "Lob (hairstyle)"
+    ],
 
-        "Square": [
-            "Bob cut",
-            "Layered hair",
-            "Long hair",
-            "Shag (haircut)",
-            "Curtain bangs",
-            "Pixie cut",
-            "Side part (hairstyle)",
-            "Ponytail",
-            "Chignon"
-        ]
-    }
+    "Rectangle": [
+        "Shoulder-length hair",
+        "Curly hair",
+        "Side-swept bangs"
+    ],
+
+    "Heart": [
+        "Layered hair",
+        "Side-swept bangs",
+        "Curly hair",
+        "Bob cut"
+    ],
+
+    "Diamond": [
+        "Bob cut",
+        "Pixie cut",
+        "Side part (hairstyle)",
+        "Lob (hairstyle)"
+    ]
+}
+
+    # ================= SELECT HAIRSTYLES =================
 
     if gender.lower() == "female":
-        hairstyles = female_hairstyles.get(face_shape, ["Long hair"])
+        hairstyles = female_hairstyles.get(face_shape, ["Long Layers"])
     else:
-        hairstyles = male_hairstyles.get(face_shape, ["Crew cut"])
+        hairstyles = male_hairstyles.get(face_shape, ["Crew Cut"])
 
     # ================= SPECS =================
 
     specs_db = {
-        "Round": [
-            "Rectangular glasses",
-            "Wayfarer",
-            "Aviator sunglasses",
-            "Square glasses"
-        ],
-        "Square": [
-            "Round glasses",
-            "Oval glasses",
-            "Aviator sunglasses"
-        ],
-        "Oval": [
-            "Square glasses",
-            "Round glasses",
-            "Wayfarer",
-            "Rimless glasses"
-        ],
-        "Rectangle": [
-            "Oval glasses",
-            "Round glasses",
-            "Rectangular glasses"
-        ],
-        "Heart": [
-            "Rimless glasses",
-            "Oval glasses"
-        ],
-        "Diamond": [
-            "Cat-eye glasses",
-            "Oval glasses"
-        ]
-    }
+    "Round": ["Rectangular glasses", "Wayfarer (glasses)", "Aviator sunglasses", "Square glasses"],
+    "Square": ["Round glasses", "Oval glasses", "Aviator sunglasses"],
+    "Oval": ["Square glasses", "Round glasses", "Wayfarer (glasses)", "Rimless glasses"],
+    "Rectangle": ["Oval glasses", "Round glasses", "Rectangular glasses"],
+    "Heart": ["Rimless glasses", "Oval glasses"],
+    "Diamond": ["Cat-eye glasses", "Oval glasses"]
+}
 
-    specs = specs_db.get(face_shape, ["Rimless glasses"])
+    specs = specs_db.get(face_shape, ["Rimless Glasses"])
 
     # ================= HATS =================
 
     hats_db = {
-        "Round": [
-            "Fedora",
-            "Wide-brimmed hat",
-            "Bucket hat",
-            "Flat cap"
-        ],
-        "Square": [
-            "Baseball cap",
-            "Beanie",
-            "Panama hat",
-            "Snapback"
-        ],
-        "Oval": [
-            "Beanie",
-            "Cowboy hat",
-            "Fedora",
-            "Bucket hat"
-        ],
-        "Rectangle": [
-            "Wide-brimmed hat",
-            "Fedora",
-            "Flat cap"
-        ],
-        "Heart": [
-            "Wide-brimmed hat",
-            "Beanie",
-            "Baseball cap"
-        ],
-        "Diamond": [
-            "Flat cap",
-            "Beanie",
-            "Fedora"
-        ]
-    }
+    "Round": ["Fedora", "Wide-brimmed hat", "Bucket hat", "Flat cap"],
+    "Square": ["Baseball cap", "Beanie", "Panama hat", "Snapback"],
+    "Oval": ["Beanie", "Cowboy hat", "Fedora", "Bucket hat"],
+    "Rectangle": ["Wide-brimmed hat", "Fedora", "Flat cap"],
+    "Heart": ["Wide-brimmed hat", "Beanie", "Baseball cap"],
+    "Diamond": ["Flat cap", "Beanie", "Fedora"]
+}
 
     hats = hats_db.get(face_shape, ["Beanie"])
 
@@ -204,9 +187,14 @@ def generate_recommendation(face_shape, skin_tone, height, weight, gender):
     else:
         colors = ["White", "Red", "Cobalt Blue", "Orange", "Purple"]
 
-    fit = "Slim Fit" if body_type == "Lean" else \
-          "Tailored Fit" if body_type == "Athletic" else \
-          "Regular Fit"
+    # ================= FIT =================
+
+    if body_type == "Lean":
+        fit = "Slim Fit"
+    elif body_type == "Athletic":
+        fit = "Tailored Fit"
+    else:
+        fit = "Regular Fit"
 
     return {
         "face_shape": face_shape,

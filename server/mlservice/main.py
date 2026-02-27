@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 import numpy as np
 import cv2
@@ -9,11 +10,6 @@ import os
 from services.face_detection import detect_face_shape
 from services.skin_tone import detect_skin_tone
 from services.recommender import generate_recommendation
-
-
-from fastapi.middleware.cors import CORSMiddleware
-
-
 
 
 app = FastAPI(title="Trend Matrix AI")
@@ -47,48 +43,38 @@ async def analyze(
     waist: float = Form(...),
     file: Optional[UploadFile] = File(None),
 ):
-    try:
 
-        if file is None:
-            return {"error": "No image provided"}
+    if file is None:
+        return {"error": "No image provided"}
 
-        contents = await file.read()
+    contents = await file.read()
+    if not contents:
+        return {"error": "Empty image received"}
 
-        if not contents:
-            return {"error": "Empty image received"}
+    np_image = np.frombuffer(contents, np.uint8)
+    image = cv2.imdecode(np_image, cv2.IMREAD_COLOR)
 
-        np_image = np.frombuffer(contents, np.uint8)
-        image = cv2.imdecode(np_image, cv2.IMREAD_COLOR)
+    if image is None:
+        return {"error": "Failed to decode image"}
 
-        if image is None:
-            return {"error": "Failed to decode image"}
+    face_shape, confidence = detect_face_shape(image)
 
-        # Face Shape Detection
-        face_shape, confidence = detect_face_shape(image)
+    if face_shape == "Face Not Detected":
+        return {"error": "No clear face detected. Please look straight at the camera."}
 
-        if face_shape == "Face Not Detected":
-            return {
-                "error": "No clear face detected. Please look straight at the camera with proper lighting."
-            }
+    skin_data = detect_skin_tone(image)
 
-        # Skin Tone Detection
-        skin_tone = detect_skin_tone(image)
+    result = generate_recommendation(
+        face_shape=face_shape,
+        skin_tone=skin_data,
+        height=height,
+        weight=weight,
+        gender=gender
+    )
 
-        # Recommendation System
-        result = generate_recommendation(
-            face_shape,
-            skin_tone,
-            height,
-            weight,
-            gender
-        )
+    result["confidence_score"] = confidence
 
-        result["confidence_score"] = confidence
-
-        return result
-
-    except Exception as e:
-        return {"error": str(e)}
+    return result
 
 
 @app.get("/health")
