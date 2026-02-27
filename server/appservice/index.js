@@ -75,23 +75,27 @@ app.get("/analyse", (request, response) => {
 
 
 app.get("/api/wiki/:name", async (req, res) => {
-    try {
-        const { name } = req.params;
-        // encodeURIComponent handles brackets and spaces: "Beanie (seam-cap)" -> "Beanie_%28seam-cap%29"
-        const wikiTitle = name.trim().replace(/\s+/g, "_");
+  try {
+    const { name } = req.params;
+    // Replace spaces with _, encode special chars
+    const wikiTitle = encodeURIComponent(name.trim().replace(/\s+/g, "_"));
 
-        const response = await axios.get(
-            `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiTitle)}`
-        );
+    console.log("Fetching Wikipedia URL:", `https://en.wikipedia.org/api/rest_v1/page/summary/${wikiTitle}`);
 
-        res.json({
-            title: response.data.title,
-            extract: response.data.extract,
-            thumbnail: response.data.thumbnail?.source
-        });
-    } catch (error) {
-        res.status(404).json({ error: "Details not found" });
-    }
+    const response = await axios.get(
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${wikiTitle}`
+    );
+
+    res.json({
+      title: response.data.title,
+      description: response.data.extract,
+      image: response.data.thumbnail?.source || null,
+      source: response.data.content_urls?.desktop?.page || null,
+    });
+  } catch (error) {
+    console.error("Wiki fetch error:", error.message);
+    res.status(404).json({ error: "Details not found" });
+  }
 });
 
 // application listening
