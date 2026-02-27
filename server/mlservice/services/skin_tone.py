@@ -27,5 +27,5 @@ def detect_skin_tone(image):
         undertone = "Neutral"
     else:
         undertone = "Cool"
-
+        
     return f"{tone} {undertone}"

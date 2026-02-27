@@ -39,7 +39,7 @@ const ProfilePage = () => {
       setProfile({
         name: response.data.user_name || "",
         bio: response.data.biography || "",
-        image: response.data.image || "https://mediastreet.ie/wp-content/uploads/2017/08/blank-profile-picture.png"
+        image: response.data.image == "https://mediastreet.ie/wp-content/uploads/2017/08/blank-profile-picture.png" ? "https://mediastreet.ie/wp-content/uploads/2017/08/blank-profile-picture.png" : response.data.image
       });
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -49,12 +49,12 @@ const ProfilePage = () => {
   const updateProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      
+
       // Use FormData instead of a JSON object for file uploads
       const formData = new FormData();
       formData.append("name", profile.name);
       formData.append("bio", profile.bio);
-      
+
       if (selectedFile) {
         formData.append("image", selectedFile);
       } else {
@@ -68,7 +68,7 @@ const ProfilePage = () => {
           "Content-Type": "multipart/form-data"
         }
       });
-      
+
       setSelectedFile(null);
       fetchProfile();
     } catch (error) {

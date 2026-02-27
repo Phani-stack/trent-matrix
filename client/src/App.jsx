@@ -18,6 +18,7 @@ import SearchUsersPage from './pages/Search.jsx';
 import PublicProfilePage from './pages/PublicProfilePage.jsx';
 import NavBar from './components/NavBar.jsx';
 import AnalysisResultPage from './pages/AnalysisResultPage.jsx';
+import WikiPage from "./pages/WikiPage";
 
 const App = () => {
   return (
@@ -83,14 +84,14 @@ const App = () => {
             }
 
           />
-          <Route
+          {/* <Route
             path="/search"
             element={
               <ProtectedRoute>
                 <SearchUsersPage />
               </ProtectedRoute>
             }
-          />
+          /> */}
 
           <Route path="/collection/:id"
             element={
@@ -108,6 +109,8 @@ const App = () => {
             <ProtectedRoute>
               <AnalysisResultPage />
             </ProtectedRoute>} />
+
+            <Route path="/wiki/:name" element={<WikiPage />} />
 
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

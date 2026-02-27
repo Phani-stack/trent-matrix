@@ -45,15 +45,18 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
+
+    const profilePictureUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbSYAgHI38DctxxtEawjjNzeRxrpGuprgDTQ&s";
+    const biography = "The trend matrix user";
     const hashedPassword = await bcrypt.hash(password, 10);
     const otp = generateOTP();
     const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 min expiry
 
     await pool.query(
       `INSERT INTO users
-       (user_name, user_email, user_password, otp, otp_expiry, is_verified)
-       VALUES (?, ?, ?, ?, ?, false)`,
-      [user_name, email, hashedPassword, otp, otpExpiry]
+       (user_name, user_email, user_password, biography, image, otp, otp_expiry, is_verified)
+       VALUES (?, ?, ?, ?, ?, ?, ?, false)`,
+      [user_name, email, hashedPassword, biography, profilePictureUrl, otp, otpExpiry]
     );
 
     await sendEmail(

@@ -3,7 +3,6 @@ import multer from 'multer';
 const upload = multer({ dest: 'uploads/' }); // Or your specific storage config
 
 
-
 export const getProfile = async (request, response) => {
     console.log("request.user:", request.user);
     const userId = request.user.userId;

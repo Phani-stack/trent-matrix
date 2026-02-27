@@ -81,6 +81,35 @@ const AnalysisResultPage = () => {
     );
   }
 
+  const handleViewDetails = (itemName) => {
+    const wikiFormatted = itemName.trim().replace(/\s+/g, "_");
+    window.open(
+      `https://en.wikipedia.org/wiki/${wikiFormatted}`,
+      "_blank"
+    );
+  };
+
+  const handleAddToCollection = async () => {
+    setLoadingCollection(true);
+    setMessage("");
+
+    try {
+      const payload = { analysis: data };
+
+      await axios.post(
+        "http://localhost:8000/api/collection/add-to-collection",
+        payload
+      );
+
+      setMessage("Added to collection successfully!");
+    } catch (error) {
+      console.error("Error adding to collection:", error);
+      setMessage("Failed to add to collection.");
+    } finally {
+      setLoadingCollection(false);
+    }
+  };
+
   const Section = ({ icon, title, children }) => (
     <section className="mb-16">
       <div className="flex items-center gap-3 mb-6 border-b border-zinc-900 pb-2">
@@ -94,35 +123,19 @@ const AnalysisResultPage = () => {
   );
 
   const Pill = ({ text }) => (
-    <div className="border border-zinc-800 px-4 py-2 text-xs uppercase tracking-wider hover:border-zinc-100 transition-colors">
-      {text}
+    <div className="border border-zinc-800 px-4 py-2 text-xs uppercase tracking-wider hover:border-zinc-100 transition-colors flex justify-between items-center gap-3">
+      <span>{text}</span>
+      <button
+        onClick={() => handleViewDetails(text)}
+        className="text-[10px] text-zinc-500 hover:text-zinc-100 transition"
+      >
+        View
+      </button>
     </div>
   );
 
-  const handleAddToCollection = async () => {
-    setLoadingCollection(true);
-    setMessage("");
-    try {
-      const payload = {
-        analysis: data,
-      };
-
-      console.log("Sending payload to collection:", payload);
-
-      await axios.post("http://localhost:8000/api/collection/add-to-collection", payload);
-
-      setMessage("Added to collection successfully!");
-    } catch (error) {
-      console.error("Error adding to collection:", error);
-      setMessage("Failed to add to collection.");
-    } finally {
-      setLoadingCollection(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-12">
-
       {/* Header */}
       <header className="mb-16">
         <motion.button
@@ -252,3 +265,4 @@ const AnalysisResultPage = () => {
 };
 
 export default AnalysisResultPage;
+

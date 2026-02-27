@@ -3,29 +3,26 @@ import express from 'express';
 // application configuration imports
 import cors from "cors";
 import "dotenv/config";
-
+import axios from 'axios';
 
 // router imports
 import authRouter from './routes/authRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import collectionRouter from './routes/collectionRouter.js';
+
 // gloabal rate limiter
 import { globalLimiter } from './middlewares/rateLimiters.js';
-
 
 // application configuration
 const app = express();
 
 app.use(globalLimiter);
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors());
 app.use('/uploads', express.static('uploads'));
 
 // development/production setup
 const port = process.env.PORT;
-
-// database connection
-
 
 // checking the application status
 app.get("/", (request, response) => {
@@ -77,6 +74,33 @@ app.get("/analyse", (request, response) => {
 });
 
 
+app.get("/api/wiki/:name", async (req, res) => {
+  try {
+    const { name } = req.params;
+
+    const response = await axios.get(
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name)}`,
+      {
+        headers: {
+          "User-Agent": "FashionAI-Hackathon-Project/1.0 (contact: kdlphani916@email.com)"
+        },
+        timeout: 15000
+      }
+    );
+
+
+    res.status(200).json({
+      title: response.data.title,
+      description: response.data.extract,
+      image: response.data.thumbnail?.source || null,
+      source: response.data.content_urls?.desktop?.page
+    });
+
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+    res.status(500).json({ error: "Failed to fetch data" });
+  }
+});
 
 // application listening
 app.listen(8000, () => console.log(`server running on http://localhost:${port}`));
