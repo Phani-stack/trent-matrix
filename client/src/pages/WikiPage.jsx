@@ -30,7 +30,7 @@ useEffect(() => {
   if (!data) {
     return (
       <div className="min-h-screen bg-zinc-950 text-zinc-400 flex items-center justify-center text-xs uppercase tracking-widest">
-        Loading Wikipedia details...
+        Loading details...
       </div>
     );
   }

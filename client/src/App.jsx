@@ -19,6 +19,8 @@ import PublicProfilePage from './pages/PublicProfilePage.jsx';
 import NavBar from './components/NavBar.jsx';
 import AnalysisResultPage from './pages/AnalysisResultPage.jsx';
 import WikiPage from "./pages/WikiPage";
+import ProductComparisonPage from "./pages/ProductComparisonPage.jsx";
+
 
 const App = () => {
   return (
@@ -100,6 +102,8 @@ const App = () => {
               // </ProtectedRoute>}
             }
           />
+
+          <Route path="/product/:name" element={<ProductComparisonPage />} />
 
           <Route path="/public-profile/:id" element={
             // <ProtectedRoute>

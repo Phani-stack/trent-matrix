@@ -77,6 +77,8 @@ async def analyze(
     return result
 
 
+
+
 @app.get("/health")
 def health():
     return {"status": "Trend Matrix AI running successfully"}

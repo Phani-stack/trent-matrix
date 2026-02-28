@@ -12,14 +12,78 @@ const Navbar = () => {
 
   const navLinks = [
     { name: "Home", path: "/" },
-    { name: "Collections", path: "/collections" },
-    { name: "Profile", path: "/profile" },
+    // { name: "Collections", path: "/collections" },
+    // { name: "Profile", path: "/profile" },
     { name: "Analyze", path: "/selection" },
     { name: "Trend Bot", path: "/chat-bot" }
   ];
 
   const isActive = (path) => location.pathname === path;
+const downloadReport = () => {
 
+    const doc = new jsPDF();
+
+    let y = 10;
+
+    doc.setFontSize(18);
+    doc.text("Trend Matrix - Style Intelligence Report", 10, y);
+    y += 10;
+
+    doc.setFontSize(12);
+
+    doc.text(`Face Shape: ${data.face_shape}`, 10, y);
+    y += 8;
+
+    doc.text(`Skin Tone: ${data.skin_tone}`, 10, y);
+    y += 8;
+
+    doc.text(`Confidence: ${data.confidence_score}%`, 10, y);
+    y += 10;
+
+    doc.text("Recommended Hairstyles:", 10, y);
+    y += 8;
+
+    data.hairstyles.forEach(style => {
+        doc.text("- " + style, 10, y);
+        y += 7;
+    });
+
+    y += 5;
+
+    doc.text("Recommended Frames:", 10, y);
+    y += 8;
+
+    data.specs.forEach(spec => {
+        doc.text("- " + spec, 10, y);
+        y += 7;
+    });
+
+    y += 5;
+
+    doc.text("Recommended Hats:", 10, y);
+    y += 8;
+
+    data.hats.forEach(hat => {
+        doc.text("- " + hat, 10, y);
+        y += 7;
+    });
+
+    y += 5;
+
+    doc.text("Recommended Colors:", 10, y);
+    y += 8;
+
+    data.clothing_colors.forEach(color => {
+        doc.text("- " + color, 10, y);
+        y += 7;
+    });
+
+    y += 5;
+
+    doc.text(`Fit Suggestion: ${data.fit}`, 10, y);
+
+    doc.save("TrendMatrix_Report.pdf");
+};
   return (
     <nav className="fixed top-0 left-0 right-0 z-[100] bg-zinc-950 border-b border-zinc-900/50 h-20">
       <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">

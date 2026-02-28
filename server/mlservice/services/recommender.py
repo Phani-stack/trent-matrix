@@ -17,25 +17,25 @@ def generate_recommendation(face_shape, skin_tone, height, weight, gender):
         "Undercut (hairstyle)",
         "Pompadour (hairstyle)",
         "Crew cut",
-        "Slicked-back hair",
-        "Quiff (hairstyle)",
+        "Ducktail",
+        "Quiff",
         "Buzz cut",
         "Fade (hairstyle)",
         "Layered hair",
-        "Taper cut",
+        "Taper cut",    
         "Ivy League (haircut)",
         "Comb over",
         "Caesar cut",
-        "Man bun",
+        "Bun (hairstyle)",
         "Flat top",
-        "Side part (hairstyle)",
+        "Curtained hair",
         "Curtain hair",
         "Short back and sides",
         "Textured crop"
     ],
 
     "Round": [
-        "Quiff (hairstyle)",
+        "Quiff",
         "Spiky hair",
         "Fringe (hairstyle)",
         "Pompadour (hairstyle)",
@@ -44,11 +44,7 @@ def generate_recommendation(face_shape, skin_tone, height, weight, gender):
         "Undercut (hairstyle)",
         "Fade (hairstyle)",
         "Taper cut",
-        "Layered hair",
-        "Textured crop",
-        "Comb over",
-        "Low fade",
-        "Classic taper"
+      
     ],
 
     "Square": [
@@ -68,19 +64,23 @@ def generate_recommendation(face_shape, skin_tone, height, weight, gender):
 
     "Rectangle": [
         "Regular haircut",
-        "Textured crop",
-        "Classic taper",
+        "Taper",
         "Pompadour (hairstyle)",
         "Layered hair",
         "Fringe (hairstyle)"
     ],
 
     "Heart": [
-        "Side-swept bangs",
-        "Layered hair",
-        "Textured hair",
-        "Fringe (hairstyle)",
-        "Soft quiff"
+        "Curtained hair",
+        "Taper cut",
+        "Buzz cut",
+        "Undercut (hairstyle)",
+        "Caesar cut",
+        "Comb over",
+        "Ivy League (haircut)",
+        "Spiky hair",
+        "Pompadour (hairstyle)"
+        
     ],
 
     "Diamond": [
@@ -155,12 +155,12 @@ def generate_recommendation(face_shape, skin_tone, height, weight, gender):
     # ================= SPECS =================
 
     specs_db = {
-    "Round": ["Rectangular glasses", "Wayfarer (glasses)", "Aviator sunglasses", "Square glasses"],
-    "Square": ["Round glasses", "Oval glasses", "Aviator sunglasses"],
-    "Oval": ["Square glasses", "Round glasses", "Wayfarer (glasses)", "Rimless glasses"],
-    "Rectangle": ["Oval glasses", "Round glasses", "Rectangular glasses"],
+    "Round": ["Wayfarer (glasses)", "Aviator sunglasses", "Glasses"],
+    "Square": ["Windsor glasses", "Oval glasses", "Aviator sunglasses"],
+    "Oval": ["Glasses", "Windsor glasses", "Wayfarer (glasses)", "Rimless glasses"],
+    "Rectangle": ["Oval glasses", "Wayfarer (glasses)", "Glasses"],
     "Heart": ["Rimless glasses", "Oval glasses"],
-    "Diamond": ["Cat-eye glasses", "Oval glasses"]
+    "Diamond": ["Cat eye glasses", "Oval glasses"]
 }
 
     specs = specs_db.get(face_shape, ["Rimless Glasses"])
@@ -168,11 +168,11 @@ def generate_recommendation(face_shape, skin_tone, height, weight, gender):
     # ================= HATS =================
 
     hats_db = {
-    "Round": ["Fedora", "Wide-brimmed hat", "Bucket hat", "Flat cap"],
+    "Round": ["Fedora", "Hat brim", "Bucket hat", "Flat cap"],
     "Square": ["Baseball cap", "Beanie", "Panama hat", "Snapback"],
     "Oval": ["Beanie", "Cowboy hat", "Fedora", "Bucket hat"],
-    "Rectangle": ["Wide-brimmed hat", "Fedora", "Flat cap"],
-    "Heart": ["Wide-brimmed hat", "Beanie", "Baseball cap"],
+    "Rectangle": ["Straw hat", "Fedora", "Flat cap"],
+    "Heart": ["Straw hat", "Beanie", "Baseball cap"],
     "Diamond": ["Flat cap", "Beanie", "Fedora"]
 }
 
