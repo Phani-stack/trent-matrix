@@ -13,7 +13,7 @@ useEffect(() => {
   const fetchWiki = async () => {
     try {
       const decodedName = decodeURIComponent(name);
-      const response = await axios.get(`http://localhost:8000/api/wiki/${decodedName}`);
+      const response = await axios.get(`http://localhost:4000/api/wiki/${decodedName}`);
       setData(response.data);
     } catch (error) {
       // If the backend returns 404, the error.response.data will contain our custom message

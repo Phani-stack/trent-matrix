@@ -60,7 +60,7 @@ const AnalysisResultPage = () => {
         formData.append("file", blob, "image.jpg");
 
         const response = await axios.post(
-          "http://127.0.0.1:8000/analyze",
+          "http://127.0.0.1:5000/analyze",
           formData
         );
 
@@ -98,7 +98,7 @@ const AnalysisResultPage = () => {
   }, [requestData]);
 
   // ✅ FULL PDF FUNCTION (WITH PAGE BREAK SUPPORT)
-  
+
 
 const handleDownloadPDF = () => {
   if (!data) return;
@@ -106,7 +106,7 @@ const handleDownloadPDF = () => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.height;
-  
+
   // --- Style Configuration ---
   const colors = {
     primary: [44, 62, 80],    // Dark Navy
@@ -131,12 +131,12 @@ const handleDownloadPDF = () => {
   const drawHeader = () => {
     doc.setFillColor(...colors.primary);
     doc.rect(0, 0, pageWidth, 25, 'F');
-    
+
     doc.setTextColor(...colors.white);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
     doc.text("STYLE INTELLIGENCE", 14, 16);
-    
+
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.text(new Date().toLocaleDateString(), pageWidth - 40, 16);
@@ -182,13 +182,13 @@ const handleDownloadPDF = () => {
   // --- Section Generator ---
   const addBeautifulSection = (title, items) => {
     checkPageBreak(40);
-    
+
     // Section Title
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(...colors.primary);
     doc.text(title.toUpperCase(), 14, y);
-    
+
     // Accent Underline
     y += 2;
     doc.setDrawColor(...colors.accent);
@@ -199,22 +199,22 @@ const handleDownloadPDF = () => {
     // List Items
     items.forEach((item) => {
       checkPageBreak(10);
-      
+
       // Bullet point (circle)
       doc.setFillColor(...colors.accent);
       doc.circle(16, y - 1, 0.8, 'F');
-      
+
       // Name
       doc.setTextColor(...colors.text);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(11);
       doc.text(item.name, 22, y);
-      
+
       // Rating / Percentage (right aligned)
       doc.setFont("helvetica", "normal");
       doc.setTextColor(...colors.light);
       doc.text(`${item.rating}% Compatibility`, pageWidth - 55, y);
-      
+
       y += 8;
     });
 
@@ -231,11 +231,11 @@ const handleDownloadPDF = () => {
   y += 10;
   doc.setFillColor(245, 246, 250); // Very light grey background
   doc.rect(14, y, pageWidth - 28, 20, 'F');
-  
+
   doc.setTextColor(...colors.primary);
   doc.setFont("helvetica", "bold");
   doc.text("PRO STYLE TIP:", 20, y + 8);
-  
+
   doc.setFont("helvetica", "italic");
   doc.setTextColor(...colors.text);
   doc.setFontSize(10);

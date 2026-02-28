@@ -78,7 +78,7 @@ app.get("/analyse", (request, response) => {
 // This regex allows letters, numbers, underscores, dots, and parentheses
 app.get("/api/wiki/:name", async (req, res) => {
   // Capture name immediately so it's available in the entire function scope
-  const rawName = req.params.name || ""; 
+  const rawName = req.params.name || "";
 
   try {
     // 1. Format for Wikipedia (Handle spaces and specific naming)
@@ -110,10 +110,10 @@ app.get("/api/wiki/:name", async (req, res) => {
     console.error(`[Wiki Error]: ${status || 'Network Error'} - ${error.message}`);
 
     // Fallback: If Wikipedia doesn't have the page, return a graceful response
-    res.status(status === 403 ? 403 : 200).json({ 
+    res.status(status === 403 ? 403 : 200).json({
       title: rawName.replace(/_/g, " "),
-      description: status === 403 
-        ? "Access to Wikipedia was denied. Check your server headers." 
+      description: status === 403
+        ? "Access to Wikipedia was denied. Check your server headers."
         : "We couldn't find a specific Wikipedia summary for this style, but it's a great look for your features!",
       image: null,
       source: null
@@ -121,4 +121,4 @@ app.get("/api/wiki/:name", async (req, res) => {
   }
 });
 // application listening
-app.listen(8000, () => console.log(`server running on http://localhost:${port}`));
+app.listen(4000, () => console.log(`server running on http://localhost:${port}`));
